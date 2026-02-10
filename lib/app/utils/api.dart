@@ -1,7 +1,12 @@
 class BaseUrl {
-  static String register = 'http://localhost:8000/api/register';
-  static String login = 'http://localhost:8000/api/login';
-  static String logout = 'http://localhost:8000/api/logout';
+  // static String register = 'http://localhost:8000/api/register';
+  // static String login = 'http://localhost:8000/api/login';
+  // static String logout = 'http://localhost:8000/api/logout';
+
+  //buat emulator android inimah
+  static String register = 'http://10.0.2.2:8000/api/register';
+  static String login = 'http://10.0.2.2:8000/api/login';
+  static String logout = 'http://10.0.2.2:8000/api/logout';
 
   static Map<String, String> defaultHeaders = {
     'Accept': 'application/json',

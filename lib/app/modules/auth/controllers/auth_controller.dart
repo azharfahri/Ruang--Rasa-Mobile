@@ -42,29 +42,55 @@ class AuthController extends GetxController {
           .login(email, password)
           .timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == BaseUrl.success) {
-        final token = response.body['token'];
-        box.write('token', token);
-        isLoggedIn.value = true;
+      // ===== ERROR HANDLING WAJIB =====
+      if (response.hasError) {
+        if (response.statusCode == 401) {
+          Get.snackbar(
+            'Login gagal',
+            'Email atau password salah',
+            backgroundColor: const Color(0xFFE16162),
+            colorText: Colors.white,
+            snackPosition: SnackPosition.TOP,
+          );
+          return;
+        }
 
-        Get.offAllNamed(Routes.HOME);
-      } else if (response.statusCode == BaseUrl.unauthorized) {
+        if (response.statusCode == 422) {
+          final errors = response.body['errors'];
+          Get.snackbar(
+            'Data tidak valid',
+            errors.values.first[0],
+            backgroundColor: const Color(0xFFF9BC60),
+            colorText: const Color(0xFF001E1D),
+            snackPosition: SnackPosition.TOP,
+          );
+          return;
+        }
+
         Get.snackbar(
-          'Login gagal',
-          'Email atau password salah',
-          backgroundColor: const Color(0xFFE16162),
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
-        );
-      } else {
-        Get.snackbar(
-          'Oops',
-          'Terjadi kesalahan (${response.statusCode})',
+          'Server bermasalah',
+          response.statusText ?? 'Terjadi kesalahan',
           backgroundColor: Colors.black87,
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
         );
+        return;
       }
+
+      // ===== LOGIN SUKSES =====
+      final token = response.body['token'];
+      box.write('token', token);
+      isLoggedIn.value = true;
+
+      Get.offAllNamed(Routes.HOME);
+
+      Get.snackbar(
+        'Selamat datang ☕',
+        'Berhasil masuk ke Ruang Rasa',
+        backgroundColor: const Color(0xFF004643),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
     } catch (_) {
       Get.snackbar(
         'Koneksi bermasalah',
