@@ -1,12 +1,20 @@
 class BaseUrl {
-  // static String register = 'http://localhost:8000/api/register';
-  // static String login = 'http://localhost:8000/api/login';
-  // static String logout = 'http://localhost:8000/api/logout';
+  static String base = 'http://localhost:8000/api';
+
+  static String register = '$base/register';
+  static String login = '$base/login';
+  static String logout = '$base/logout';
+  static String profile = '$base/profile';
+
+  static String cabang = '$base/branches'; // Menyesuaikan JSON "List cabang" kamu
+  static String produk = '$base/products'; // Menyesuaikan JSON "Produk" kamu
 
   //buat emulator android inimah
-  static String register = 'http://10.0.2.2:8000/api/register';
-  static String login = 'http://10.0.2.2:8000/api/login';
-  static String logout = 'http://10.0.2.2:8000/api/logout';
+  // static String register = 'http://10.0.2.2:8000/api/register';
+  // static String login = 'http://10.0.2.2:8000/api/login';
+  // static String profile = 'http://10.0.2.2:8000/api/profile';
+  // static String logout = 'http://10.0.2.2:8000/api/logout';
+
 
   static Map<String, String> defaultHeaders = {
     'Accept': 'application/json',

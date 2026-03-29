@@ -6,6 +6,8 @@ import '../modules/auth/views/login_view.dart';
 import '../modules/auth/views/register_view.dart';
 import '../modules/dashboard/bindings/dashboard_binding.dart';
 import '../modules/dashboard/views/dashboard_view.dart';
+import '../modules/detail_produk/bindings/detail_produk_binding.dart';
+import '../modules/detail_produk/views/detail_produk_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -25,6 +27,11 @@ class AppPages {
       name: _Paths.HOME,
       page: () => const HomeView(),
       bindings: [HomeBinding(), AuthBinding()],
+    ),
+    GetPage(
+      name: '/detail-produk',
+      page: () => const DetailProdukView(),
+      binding: DetailProdukBinding(), // Jika pakai CLI, generate bindingnya
     ),
     GetPage(
       name: _Paths.AUTH,
@@ -56,6 +63,11 @@ class AppPages {
       name: _Paths.DASHBOARD,
       page: () => const DashboardView(),
       binding: DashboardBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_PRODUK,
+      page: () => const DetailProdukView(),
+      binding: DetailProdukBinding(),
     ),
   ];
 }
