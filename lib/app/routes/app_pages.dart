@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:ruang_rasa_mobile/main_page.dart';
 
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
@@ -23,6 +24,10 @@ class AppPages {
   static const INITIAL = Routes.HOME;
 
   static final routes = [
+    GetPage(
+      name: '/main',
+      page: () => MainPage(),
+    ),
     GetPage(
       name: _Paths.HOME,
       page: () => const HomeView(),

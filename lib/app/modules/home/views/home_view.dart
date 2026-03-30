@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart'; // Untuk format rupiah
+import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
-  // Palette Ruang Rasa
   static const Color bgColor = Color(0xFF004643);
   static const Color accentColor = Color(0xFFF9BC60);
   static const Color textColor = Color(0xFFFFFFFE);
@@ -22,7 +23,7 @@ class HomeView extends GetView<HomeController> {
       appBar: AppBar(
         title: const Text(
           'Ruang Rasa',
-          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -37,7 +38,8 @@ class HomeView extends GetView<HomeController> {
             }
             return TextButton(
               onPressed: () => Get.toNamed('/login'),
-              child: const Text('Masuk', style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
+              child: const Text('Masuk',
+                  style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
             );
           }),
         ],
@@ -47,94 +49,122 @@ class HomeView extends GetView<HomeController> {
           return const Center(child: CircularProgressIndicator(color: accentColor));
         }
 
-        return RefreshIndicator(
-          onRefresh: () => controller.fetchDataAwal(),
-          color: accentColor,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            children: [
-              const SizedBox(height: 10),
-              // --- HEADER ---
-              const Text(
-                'Selamat Datang di',
-                style: TextStyle(color: secondaryTextColor, fontSize: 16),
-              ),
-              const Text(
-                'Ruang Rasa Coffee',
-                style: TextStyle(color: textColor, fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 25),
-
-              // --- DROPDOWN CABANG ---
-              const Text(
-                'Pilih Lokasi Cabang',
-                style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: accentColor.withOpacity(0.3)),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    dropdownColor: cardColor,
-                    isExpanded: true,
-                    value: controller.selectedCabangId.value,
-                    icon: const Icon(Icons.location_on, color: accentColor),
-                    items: controller.listCabang.map((cabang) {
-                      return DropdownMenuItem<int>(
-                        value: cabang['id'],
-                        child: Text(cabang['name'], style: const TextStyle(color: textColor)),
-                      );
-                    }).toList(),
-                    onChanged: (val) => controller.changeCabang(val),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // --- GRID PRODUK ---
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: () => controller.fetchDataAwal(),
+              color: accentColor,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  Text(
-                    'Menu Spesial',
-                    style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Selamat Datang di',
+                    style: TextStyle(color: secondaryTextColor, fontSize: 14),
                   ),
-                  Text(
-                    'Lihat Semua',
-                    style: TextStyle(color: accentColor, fontSize: 12),
+                  const Text(
+                    'Ruang Rasa Coffee',
+                    style: TextStyle(
+                        color: textColor,
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold),
                   ),
+                  const SizedBox(height: 25),
+
+                  // LOKASI CABANG
+                  _buildSectionTitle('Pilih Lokasi Cabang', null),
+                  const SizedBox(height: 12),
+                  _buildBranchDropdown(),
+
+                  const SizedBox(height: 30),
+
+                  // MENU SPESIAL
+                  _buildSectionTitle('Menu Spesial', 'Lihat Semua'),
+                  const SizedBox(height: 16),
+
+                  // GRID PRODUK (Dibatasi misal 4-6 produk saja)
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    // Menampilkan maksimal 6 produk untuk tampilan "Spesial"
+                    itemCount: controller.listProduk.length > 6 ? 6 : controller.listProduk.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.68, // Disesuaikan agar teks tidak terpotong
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = controller.listProduk[index];
+                      return _buildProductCard(item);
+                    },
+                  ),
+
+                  const SizedBox(height: 120), 
                 ],
               ),
-              const SizedBox(height: 15),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: controller.listProduk.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.7,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                ),
-                itemBuilder: (context, index) {
-                  final item = controller.listProduk[index];
-                  return _buildProductCard(item);
-                },
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
+            ),
+
+            Positioned(
+              bottom: 25,
+              left: 20,
+              right: 20,
+              child: CartBar(),
+            ),
+          ],
         );
       }),
     );
   }
 
-  // Widget Card Produk
+  // Helper untuk Judul Section
+  Widget _buildSectionTitle(String title, String? actionText) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+              color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        if (actionText != null)
+          Text(
+            actionText,
+            style: const TextStyle(color: accentColor, fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+      ],
+    );
+  }
+
+  // Dropdown Cabang yang lebih bersih
+  Widget _buildBranchDropdown() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: accentColor.withOpacity(0.2)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          dropdownColor: cardColor,
+          isExpanded: true,
+          value: controller.selectedCabangId.value,
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: accentColor),
+          items: controller.listCabang.map((cabang) {
+            return DropdownMenuItem<int>(
+              value: cabang['id'],
+              child: Text(cabang['name'],
+                  style: const TextStyle(color: textColor, fontSize: 14)),
+            );
+          }).toList(),
+          onChanged: (val) => controller.changeCabang(val),
+        ),
+      ),
+    );
+  }
+
+  // UPDATE PRODUCT CARD YANG LEBIH RAPI
   Widget _buildProductCard(Map<String, dynamic> item) {
     return GestureDetector(
       onTap: () => Get.toNamed('/detail-produk', arguments: item),
@@ -142,55 +172,73 @@ class HomeView extends GetView<HomeController> {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            )
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            // Gambar Produk (dengan ClipRRect agar melengkung di atas saja)
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              child: AspectRatio(
+                aspectRatio: 1, // Agar gambar kotak sempurna
                 child: Image.network(
-                  item['image'],
-                  width: double.infinity,
+                  item['image'] ?? 'https://via.placeholder.com/150',
                   fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => Container(
-                    color: Colors.white10,
-                    child: const Icon(Icons.coffee_rounded, color: accentColor),
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.image_not_supported, color: Colors.grey),
+                ),
+              ),
+            ),
+            
+            // Info Produk
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Kategori
+                  Text(
+                    item['category']['name'], // Pastikan key 'category' ada di map produk kamu
+                    style: const TextStyle(
+                      color: accentColor, 
+                      fontSize: 10, 
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  
+                  // Nama Produk
+                  Text(
+                    item['name'],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: textColor, 
+                        fontSize: 15, 
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Harga
+                  Text(
+                    "Rp ${NumberFormat('#,###').format(item['price'])}", // Format: Rp 15,000
+                    style: const TextStyle(
+                      color: secondaryTextColor, 
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            // Text Details
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      item['category']['name'],
-                      style: const TextStyle(color: accentColor, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item['name'],
-                      style: const TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      "Rp ${item['price']}",
-                      style: const TextStyle(color: secondaryTextColor, fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            )
           ],
         ),
       ),
@@ -199,20 +247,107 @@ class HomeView extends GetView<HomeController> {
 
   void _confirmLogout(AuthController authC) {
     Get.defaultDialog(
-      title: 'Logout',
-      middleText: 'Yakin mau keluar?',
-      backgroundColor: cardColor,
-      titleStyle: const TextStyle(color: textColor),
-      middleTextStyle: const TextStyle(color: secondaryTextColor),
-      textConfirm: 'Ya',
+      title: 'Keluar',
+      middleText: 'Apakah kamu yakin ingin keluar dari aplikasi?',
+      textConfirm: 'Ya, Keluar',
       textCancel: 'Batal',
-      confirmTextColor: cardColor,
-      cancelTextColor: accentColor,
+      confirmTextColor: bgColor,
       buttonColor: accentColor,
       onConfirm: () {
         Get.back();
         authC.logout();
       },
     );
+  }
+}
+class CartBar extends StatelessWidget {
+  final cart = Get.find<CartController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      if (cart.items.isEmpty) return const SizedBox.shrink();
+
+      return GestureDetector(
+        onTap: () => Get.toNamed('/cart'),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9BC60),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.shopping_bag_rounded, color: Color(0xFF001E1D), size: 28),
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF004643),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        "${cart.totalItems}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Total Pesanan",
+                      style: TextStyle(
+                        color: Color(0xFF001E1D),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "Rp ${NumberFormat('#,###').format(cart.totalPrice)}",
+                      style: const TextStyle(
+                        color: Color(0xFF001E1D),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Text(
+                "Cek Keranjang",
+                style: TextStyle(
+                  color: Color(0xFF001E1D),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF001E1D), size: 14),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

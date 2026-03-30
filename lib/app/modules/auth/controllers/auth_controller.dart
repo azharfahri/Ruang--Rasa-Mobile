@@ -82,7 +82,7 @@ class AuthController extends GetxController {
       box.write('token', token);
       isLoggedIn.value = true;
 
-      Get.offAllNamed(Routes.HOME);
+      Get.offAllNamed(Routes.MAIN);
 
       Get.snackbar(
         'Selamat datang ☕',

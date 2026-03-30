@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
 import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/detail_produk_controller.dart';
 
 class DetailProdukView extends GetView<DetailProdukController> {
@@ -38,11 +40,15 @@ class DetailProdukView extends GetView<DetailProdukController> {
                           )
                         : null,
                   ),
-                  child: product.image == null 
-                      ? const Icon(Icons.image_not_supported, size: 50, color: Colors.white54) 
+                  child: product.image == null
+                      ? const Icon(
+                          Icons.image_not_supported,
+                          size: 50,
+                          color: Colors.white54,
+                        )
                       : null,
                 ),
-                
+
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -55,12 +61,20 @@ class DetailProdukView extends GetView<DetailProdukController> {
                           Expanded(
                             child: Text(
                               product.name ?? 'Nama Produk',
-                              style: const TextStyle(color: textColor, fontSize: 24, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: textColor,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           Text(
                             "Rp ${product.price ?? 0}",
-                            style: const TextStyle(color: accentColor, fontSize: 20, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: accentColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -68,7 +82,10 @@ class DetailProdukView extends GetView<DetailProdukController> {
                       // Deskripsi
                       Text(
                         product.description ?? 'Tidak ada deskripsi.',
-                        style: const TextStyle(color: Color(0xFFABD1C6), fontSize: 14),
+                        style: const TextStyle(
+                          color: Color(0xFFABD1C6),
+                          fontSize: 14,
+                        ),
                       ),
                       const SizedBox(height: 30),
 
@@ -79,50 +96,74 @@ class DetailProdukView extends GetView<DetailProdukController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildOptionTitle(type.name ?? ""),
-                              
+
                               // Menggunakan Wrap agar opsi otomatis turun ke bawah jika layar tidak muat
                               Wrap(
                                 spacing: 15,
                                 runSpacing: 15,
-                                children: type.variantOptions?.map((option) {
-                                  return Obx(() {
-                                    // Tentukan apakah opsi ini sedang dipilih
-                                    bool isSelected = false;
-                                    if (type.inputType == 'radio') {
-                                      isSelected = controller.selectedRadios[type.id] == option.id;
-                                    } else {
-                                      isSelected = controller.selectedCheckboxes[option.id] == true;
-                                    }
-
-                                    // Format label (tampilkan penambahan harga jika ada)
-                                    String label = option.optionName ?? "";
-                                    if (option.priceImpact != null && option.priceImpact! > 0) {
-                                      label += "\n(+ Rp ${option.priceImpact})";
-                                    }
-
-                                    return GestureDetector(
-                                      onTap: () {
+                                children:
+                                    type.variantOptions?.map((option) {
+                                      return Obx(() {
+                                        // Tentukan apakah opsi ini sedang dipilih
+                                        bool isSelected = false;
                                         if (type.inputType == 'radio') {
-                                          controller.selectRadio(type.id!, option.id!);
+                                          isSelected =
+                                              controller.selectedRadios[type
+                                                  .id] ==
+                                              option.id;
                                         } else {
-                                          controller.toggleCheckbox(option.id!);
+                                          isSelected =
+                                              controller
+                                                  .selectedCheckboxes[option
+                                                  .id] ==
+                                              true;
                                         }
-                                      },
-                                      // Lebar diatur agar pas (tidak pakai Expanded lagi di dalam Wrap)
-                                      child: SizedBox(
-                                        width: (Get.width / 2) - 28, // Dibagi 2 kolom dengan margin
-                                        child: _buildSelectBox(label, null, isSelected),
-                                      ),
-                                    );
-                                  });
-                                }).toList() ?? [],
+
+                                        // Format label (tampilkan penambahan harga jika ada)
+                                        String label = option.optionName ?? "";
+                                        if (option.priceImpact != null &&
+                                            option.priceImpact! > 0) {
+                                          label +=
+                                              "\n(+ Rp ${option.priceImpact})";
+                                        }
+
+                                        return GestureDetector(
+                                          onTap: () {
+                                            if (type.inputType == 'radio') {
+                                              controller.selectRadio(
+                                                type.id!,
+                                                option.id!,
+                                              );
+                                            } else {
+                                              controller.toggleCheckbox(
+                                                option.id!,
+                                              );
+                                            }
+                                          },
+                                          // Lebar diatur agar pas (tidak pakai Expanded lagi di dalam Wrap)
+                                          child: SizedBox(
+                                            width:
+                                                (Get.width / 2) -
+                                                28, // Dibagi 2 kolom dengan margin
+                                            child: _buildSelectBox(
+                                              label,
+                                              null,
+                                              isSelected,
+                                            ),
+                                          ),
+                                        );
+                                      });
+                                    }).toList() ??
+                                    [],
                               ),
                               const SizedBox(height: 25),
                             ],
                           );
                         }).toList(),
-                      
-                      const SizedBox(height: 100), // Space agar tidak tertutup bottom bar
+
+                      const SizedBox(
+                        height: 100,
+                      ), // Space agar tidak tertutup bottom bar
                     ],
                   ),
                 ),
@@ -167,16 +208,21 @@ class DetailProdukView extends GetView<DetailProdukController> {
                     child: Row(
                       children: [
                         IconButton(
-                          onPressed: () => controller.decrement(), 
-                          icon: const Icon(Icons.remove, color: accentColor)
+                          onPressed: () => controller.decrement(),
+                          icon: const Icon(Icons.remove, color: accentColor),
                         ),
-                        Obx(() => Text(
-                          "${controller.quantity.value}", 
-                          style: const TextStyle(color: textColor, fontWeight: FontWeight.bold)
-                        )),
+                        Obx(
+                          () => Text(
+                            "${controller.quantity.value}",
+                            style: const TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                         IconButton(
-                          onPressed: () => controller.increment(), 
-                          icon: const Icon(Icons.add, color: accentColor)
+                          onPressed: () => controller.increment(),
+                          icon: const Icon(Icons.add, color: accentColor),
                         ),
                       ],
                     ),
@@ -186,19 +232,44 @@ class DetailProdukView extends GetView<DetailProdukController> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Logika masukkan ke keranjang lokal/database
-                        print("Add to cart ditekan!");
+                        final box = GetStorage();
+                        final isLogin = box.read('token');
+
+                        if (isLogin == null) {
+                          Get.snackbar(
+                            "Login terlebih dahulu",
+                            "Biar bisa pesan kopi kamu",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+
+                          Get.toNamed('/login');
+                          return;
+                        }
+
+                        final cart = Get.find<CartController>();
+
+                        cart.addItem({
+                          'id':
+                              product.id ??
+                              DateTime.now()
+                                  .millisecondsSinceEpoch, // 👈 ANTI NULL
+                          'name': product.name ?? 'Produk',
+                          'price': controller.totalPrice ?? 0,
+                          'qty': controller.quantity.value,
+                        });
+
+                        Get.back();
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      child: Obx(
+                        () => Text(
+                          "+ Keranjang Rp ${controller.totalPrice}",
+                          style: const TextStyle(
+                            color: cardColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      child: Obx(() => Text(
-                        "+ Keranjang Rp ${controller.totalPrice}",
-                        style: const TextStyle(color: cardColor, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      )),
                     ),
                   ),
                 ],
@@ -215,7 +286,11 @@ class DetailProdukView extends GetView<DetailProdukController> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Text(
         title,
-        style: const TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          color: textColor,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -234,7 +309,8 @@ class DetailProdukView extends GetView<DetailProdukController> {
       ),
       child: Column(
         children: [
-          if (icon != null) Icon(icon, color: isSelected ? accentColor : Colors.grey, size: 30),
+          if (icon != null)
+            Icon(icon, color: isSelected ? accentColor : Colors.grey, size: 30),
           if (icon != null) const SizedBox(height: 5),
           Text(
             label,
