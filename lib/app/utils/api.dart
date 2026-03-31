@@ -1,5 +1,5 @@
 class BaseUrl {
-  static String base = 'http://localhost:8000/api';
+  static String base = 'http://10.0.2.2:8000/api';
 
   static String register = '$base/register';
   static String login = '$base/login';

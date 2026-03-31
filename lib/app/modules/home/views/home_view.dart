@@ -23,7 +23,11 @@ class HomeView extends GetView<HomeController> {
       appBar: AppBar(
         title: const Text(
           'Ruang Rasa',
-          style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -38,15 +42,22 @@ class HomeView extends GetView<HomeController> {
             }
             return TextButton(
               onPressed: () => Get.toNamed('/login'),
-              child: const Text('Masuk',
-                  style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Masuk',
+                style: TextStyle(
+                  color: accentColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             );
           }),
         ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: accentColor));
+          return const Center(
+            child: CircularProgressIndicator(color: accentColor),
+          );
         }
 
         return Stack(
@@ -65,9 +76,10 @@ class HomeView extends GetView<HomeController> {
                   const Text(
                     'Ruang Rasa Coffee',
                     style: TextStyle(
-                        color: textColor,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold),
+                      color: textColor,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 25),
 
@@ -87,30 +99,29 @@ class HomeView extends GetView<HomeController> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     // Menampilkan maksimal 6 produk untuk tampilan "Spesial"
-                    itemCount: controller.listProduk.length > 6 ? 6 : controller.listProduk.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.68, // Disesuaikan agar teks tidak terpotong
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
+                    itemCount: controller.listProduk.length > 6
+                        ? 6
+                        : controller.listProduk.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio:
+                              0.68, // Disesuaikan agar teks tidak terpotong
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
                     itemBuilder: (context, index) {
                       final item = controller.listProduk[index];
                       return _buildProductCard(item);
                     },
                   ),
 
-                  const SizedBox(height: 120), 
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
 
-            Positioned(
-              bottom: 25,
-              left: 20,
-              right: 20,
-              child: CartBar(),
-            ),
+            Positioned(bottom: 25, left: 20, right: 20, child: CartBar()),
           ],
         );
       }),
@@ -125,12 +136,19 @@ class HomeView extends GetView<HomeController> {
         Text(
           title,
           style: const TextStyle(
-              color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+            color: textColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         if (actionText != null)
           Text(
             actionText,
-            style: const TextStyle(color: accentColor, fontSize: 13, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              color: accentColor,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
       ],
     );
@@ -150,12 +168,17 @@ class HomeView extends GetView<HomeController> {
           dropdownColor: cardColor,
           isExpanded: true,
           value: controller.selectedCabangId.value,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: accentColor),
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: accentColor,
+          ),
           items: controller.listCabang.map((cabang) {
             return DropdownMenuItem<int>(
               value: cabang['id'],
-              child: Text(cabang['name'],
-                  style: const TextStyle(color: textColor, fontSize: 14)),
+              child: Text(
+                cabang['name'],
+                style: const TextStyle(color: textColor, fontSize: 14),
+              ),
             );
           }).toList(),
           onChanged: (val) => controller.changeCabang(val),
@@ -177,7 +200,7 @@ class HomeView extends GetView<HomeController> {
               color: Colors.black.withOpacity(0.1),
               blurRadius: 10,
               offset: const Offset(0, 5),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -185,18 +208,25 @@ class HomeView extends GetView<HomeController> {
           children: [
             // Gambar Produk (dengan ClipRRect agar melengkung di atas saja)
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              child: AspectRatio(
-                aspectRatio: 1, // Agar gambar kotak sempurna
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+              child: SizedBox(
+                height: 140,
+                width: double.infinity,
                 child: Image.network(
-                  item['image'] ?? 'https://via.placeholder.com/150',
+                  "${item['image']}",
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.image_not_supported, color: Colors.grey),
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: Icon(Icons.image_not_supported),
+                    );
+                  },
                 ),
               ),
             ),
-            
+
             // Info Produk
             Padding(
               padding: const EdgeInsets.all(12),
@@ -207,38 +237,39 @@ class HomeView extends GetView<HomeController> {
                   Text(
                     item['category']['name'], // Pastikan key 'category' ada di map produk kamu
                     style: const TextStyle(
-                      color: accentColor, 
-                      fontSize: 10, 
+                      color: accentColor,
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  
+
                   // Nama Produk
                   Text(
                     item['name'],
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        color: textColor, 
-                        fontSize: 15, 
-                        fontWeight: FontWeight.bold),
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Harga
                   Text(
                     "Rp ${NumberFormat('#,###').format(item['price'])}", // Format: Rp 15,000
                     style: const TextStyle(
-                      color: secondaryTextColor, 
+                      color: secondaryTextColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -260,6 +291,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 }
+
 class CartBar extends StatelessWidget {
   final cart = Get.find<CartController>();
 
@@ -288,7 +320,11 @@ class CartBar extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  const Icon(Icons.shopping_bag_rounded, color: Color(0xFF001E1D), size: 28),
+                  const Icon(
+                    Icons.shopping_bag_rounded,
+                    color: Color(0xFF001E1D),
+                    size: 28,
+                  ),
                   Positioned(
                     right: -4,
                     top: -4,
@@ -343,7 +379,11 @@ class CartBar extends StatelessWidget {
                   fontSize: 14,
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF001E1D), size: 14),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Color(0xFF001E1D),
+                size: 14,
+              ),
             ],
           ),
         ),
