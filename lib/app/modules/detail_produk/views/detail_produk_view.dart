@@ -238,7 +238,7 @@ class DetailProdukView extends GetView<DetailProdukController> {
                         if (isLogin == null) {
                           Get.snackbar(
                             "Login terlebih dahulu",
-                            "Biar bisa pesan kopi kamu",
+                            "Agar bisa pesan kopi kamu",
                             snackPosition: SnackPosition.BOTTOM,
                           );
 

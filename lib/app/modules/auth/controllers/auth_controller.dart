@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
 import 'package:ruang_rasa_mobile/app/routes/app_pages.dart';
 import 'package:ruang_rasa_mobile/app/services/auth_service.dart';
 import 'package:ruang_rasa_mobile/app/utils/api.dart';
@@ -80,12 +81,20 @@ class AuthController extends GetxController {
       // ===== LOGIN SUKSES =====
       final token = response.body['token'];
       box.write('token', token);
+      box.write('user_id', response.body['user']['id']);
+      print("USER ID: ${box.read('user_id')}");
+
+      // ambil cart controller
+      final cart = Get.find<CartController>();
+
+      cart.clearCart();
+      cart.loadCart(); 
       isLoggedIn.value = true;
 
       Get.offAllNamed(Routes.MAIN);
 
       Get.snackbar(
-        'Selamat datang ☕',
+        'Selamat datang',
         'Berhasil masuk ke Ruang Rasa',
         backgroundColor: const Color(0xFF004643),
         colorText: Colors.white,
@@ -113,7 +122,7 @@ class AuthController extends GetxController {
       // ===== REGISTER BERHASIL =====
       if (response.statusCode == BaseUrl.created) {
         Get.snackbar(
-          'Akun berhasil dibuat ☕',
+          'Akun berhasil dibuat',
           'Silakan login dan nikmati Ruang Rasa',
           backgroundColor: const Color(0xFF004643),
           colorText: Colors.white,
@@ -167,12 +176,16 @@ class AuthController extends GetxController {
         await api.logout(token);
         box.remove('token');
       }
+
       isLoggedIn.value = false;
 
-      Get.offAllNamed(Routes.LOGIN);
+      final cart = Get.find<CartController>();
+      cart.clearCart();
+
+      Get.offAllNamed(Routes.MAIN);
 
       Get.snackbar(
-        'Sampai jumpa ☕',
+        'Sampai jumpa',
         'Kamu keluar dari Ruang Rasa',
         backgroundColor: const Color(0xFF001E1D),
         colorText: const Color(0xFFABD1C6),
@@ -180,8 +193,11 @@ class AuthController extends GetxController {
       );
     } catch (_) {
       box.remove('token');
-      Get.reset();
-      Get.offAllNamed(Routes.LOGIN);
+
+      final cart = Get.find<CartController>();
+      cart.clearCart();
+
+      Get.offAllNamed(Routes.MAIN);
     } finally {
       isLoading.value = false;
     }

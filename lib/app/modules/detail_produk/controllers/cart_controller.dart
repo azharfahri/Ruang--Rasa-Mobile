@@ -1,8 +1,36 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class CartController extends GetxController {
+  final box = GetStorage();
   // list item keranjang
   var items = <Map<String, dynamic>>[].obs;
+
+  void saveCart() {
+    final userId = box.read('user_id');
+    print("SAVE CART USER: $userId");
+print("ITEMS: $items");
+    if (userId != null) {
+      box.write('cart_$userId', items.toList());
+    }
+  }
+
+  void loadCart() {
+    final userId = box.read('user_id');
+    print("LOAD CART USER: $userId");
+print("DATA: ${box.read('cart_$userId')}");
+
+    if (userId != null) {
+      final data = box.read('cart_$userId');
+
+      if (data != null) {
+        items.value = List<Map<String, dynamic>>.from(data);
+        items.refresh();
+      } else {
+        items.clear();
+      }
+    }
+  }
 
   // ================= TAMBAH ITEM =================
   void addItem(Map<String, dynamic> item) {
@@ -18,11 +46,13 @@ class CartController extends GetxController {
     }
 
     items.refresh();
+    saveCart();
   }
 
   // ================= HAPUS ITEM =================
   void removeItem(int id) {
     items.removeWhere((item) => item['id'] == id);
+    saveCart();
   }
 
   // ================= TOTAL ITEM =================
