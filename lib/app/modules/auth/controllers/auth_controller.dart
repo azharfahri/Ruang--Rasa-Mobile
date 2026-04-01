@@ -169,7 +169,6 @@ class AuthController extends GetxController {
       }
       isLoggedIn.value = false;
 
-      Get.reset();
       Get.offAllNamed(Routes.LOGIN);
 
       Get.snackbar(

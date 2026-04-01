@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // Untuk format rupiah
 import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
+import 'package:ruang_rasa_mobile/app/routes/app_pages.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -190,7 +192,7 @@ class HomeView extends GetView<HomeController> {
   // UPDATE PRODUCT CARD YANG LEBIH RAPI
   Widget _buildProductCard(Map<String, dynamic> item) {
     return GestureDetector(
-      onTap: () => Get.toNamed('/detail-produk', arguments: item),
+      onTap: () => Get.toNamed(Routes.DETAIL_PRODUK, arguments: item),
       child: Container(
         decoration: BoxDecoration(
           color: cardColor,
@@ -214,15 +216,17 @@ class HomeView extends GetView<HomeController> {
               child: SizedBox(
                 height: 140,
                 width: double.infinity,
-                child: Image.network(
-                  "${item['image']}",
+                child: CachedNetworkImage(
+                  imageUrl: "${item['image']}",
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: Icon(Icons.image_not_supported),
-                    );
-                  },
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.image_not_supported),
+                  ),
                 ),
               ),
             ),

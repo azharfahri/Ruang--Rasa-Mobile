@@ -34,11 +34,6 @@ class AppPages {
       bindings: [HomeBinding(), AuthBinding()],
     ),
     GetPage(
-      name: '/detail-produk',
-      page: () => const DetailProdukView(),
-      binding: DetailProdukBinding(), // Jika pakai CLI, generate bindingnya
-    ),
-    GetPage(
       name: _Paths.AUTH,
       page: () => const AuthView(),
       binding: AuthBinding(),
