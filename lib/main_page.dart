@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ruang_rasa_mobile/app/modules/home/views/home_view.dart';
+import 'package:ruang_rasa_mobile/app/modules/product/views/product_view.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -10,8 +11,8 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    HomeView(), // 👈 beranda kamu
-    Center(child: Text("Menu")),
+    HomeView(),
+    ProductView(),
     Center(child: Text("Profile")),
   ];
 

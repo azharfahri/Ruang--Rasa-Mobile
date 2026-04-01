@@ -8,6 +8,7 @@ class BaseUrl {
 
   static String cabang = '$base/branches'; // Menyesuaikan JSON "List cabang" kamu
   static String produk = '$base/products'; // Menyesuaikan JSON "Produk" kamu
+  static String categories = '$base/categories';
 
   //buat emulator android inimah
   // static String register = 'http://10.0.2.2:8000/api/register';

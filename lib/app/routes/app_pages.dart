@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:ruang_rasa_mobile/main_page.dart';
 
+import '../../main_page.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/auth/views/login_view.dart';
@@ -11,6 +11,8 @@ import '../modules/detail_produk/bindings/detail_produk_binding.dart';
 import '../modules/detail_produk/views/detail_produk_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/product/bindings/product_binding.dart';
+import '../modules/product/views/product_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/splash_screen/bindings/splash_screen_binding.dart';
@@ -68,6 +70,11 @@ class AppPages {
       name: _Paths.DETAIL_PRODUK,
       page: () => const DetailProdukView(),
       binding: DetailProdukBinding(),
+    ),
+    GetPage(
+      name: _Paths.PRODUCT,
+      page: () => const ProductView(),
+      binding: ProductBinding(),
     ),
   ];
 }
