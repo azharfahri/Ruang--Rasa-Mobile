@@ -2,7 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // Untuk format rupiah
-import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
+import 'package:ruang_rasa_mobile/app/data/models/product_model.dart';
+import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/addcart_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
 import 'package:ruang_rasa_mobile/app/routes/app_pages.dart';
 import '../controllers/home_controller.dart';
@@ -176,9 +177,9 @@ class HomeView extends GetView<HomeController> {
           ),
           items: controller.listCabang.map((cabang) {
             return DropdownMenuItem<int>(
-              value: cabang['id'],
+              value: cabang.id,
               child: Text(
-                cabang['name'],
+                cabang.name ?? "-",
                 style: const TextStyle(color: textColor, fontSize: 14),
               ),
             );
@@ -190,7 +191,7 @@ class HomeView extends GetView<HomeController> {
   }
 
   // UPDATE PRODUCT CARD YANG LEBIH RAPI
-  Widget _buildProductCard(Map<String, dynamic> item) {
+  Widget _buildProductCard(ProductModel item) {
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.DETAIL_PRODUK, arguments: item),
       child: Container(
@@ -208,7 +209,6 @@ class HomeView extends GetView<HomeController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar Produk (dengan ClipRRect agar melengkung di atas saja)
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
@@ -217,7 +217,7 @@ class HomeView extends GetView<HomeController> {
                 height: 140,
                 width: double.infinity,
                 child: CachedNetworkImage(
-                  imageUrl: "${item['image']}",
+                  imageUrl: item.image ?? "",
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
                     color: Colors.grey[200],
@@ -231,15 +231,13 @@ class HomeView extends GetView<HomeController> {
               ),
             ),
 
-            // Info Produk
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Kategori
                   Text(
-                    item['category']['name'], // Pastikan key 'category' ada di map produk kamu
+                    item.category?.name ?? "-",
                     style: const TextStyle(
                       color: accentColor,
                       fontSize: 10,
@@ -249,9 +247,8 @@ class HomeView extends GetView<HomeController> {
                   ),
                   const SizedBox(height: 4),
 
-                  // Nama Produk
                   Text(
-                    item['name'],
+                    item.name ?? "-",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -262,9 +259,8 @@ class HomeView extends GetView<HomeController> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Harga
                   Text(
-                    "Rp ${NumberFormat('#,###').format(item['price'])}", // Format: Rp 15,000
+                    "Rp ${NumberFormat('#,###').format(item.price ?? 0)}",
                     style: const TextStyle(
                       color: secondaryTextColor,
                       fontSize: 14,
@@ -298,10 +294,62 @@ class HomeView extends GetView<HomeController> {
 
 class CartBar extends StatelessWidget {
   final cart = Get.find<CartController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      // =====================
+      // BELUM LOGIN
+      // =====================
+      if (!authC.isLoggedIn.value) {
+        return GestureDetector(
+          onTap: () => Get.toNamed('/login'),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9BC60),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.person,
+                  color: Color(0xFF001E1D),
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Text(
+                    "Masuk atau Daftar",
+                    style: TextStyle(
+                      color: Color(0xFF001E1D),
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Color(0xFF001E1D),
+                  size: 14,
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // =====================
+      // SUDAH LOGIN
+      // =====================
       if (cart.items.isEmpty) return const SizedBox.shrink();
 
       return GestureDetector(

@@ -1,17 +1,20 @@
-import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:ruang_rasa_mobile/app/data/models/branch_model.dart';
+import 'package:ruang_rasa_mobile/app/data/models/category_group_model.dart';
+import 'package:ruang_rasa_mobile/app/data/models/category_model.dart';
+import 'package:ruang_rasa_mobile/app/data/models/product_model.dart';
+import 'package:ruang_rasa_mobile/app/services/product_service.dart';
 import 'package:ruang_rasa_mobile/app/utils/api.dart';
 
 class ProductController extends GetxController {
   var isLoading = true.obs;
 
-  var allProductsWithCategories = <dynamic>[].obs;
-  var branchList = <dynamic>[].obs;
+  var allProductsWithCategories = <CategoryGroupModel>[].obs;
+  var branchList = <BranchModel>[].obs;
+  var selectedBranchData = Rxn<BranchModel>();
 
   var selectedBranchId = RxnInt();
-  var selectedBranchData = {}.obs;
   var selectedCategorySlug = "".obs;
 
   final scrollController = ScrollController();
@@ -28,86 +31,57 @@ class ProductController extends GetxController {
       isLoading(true);
 
       // =====================
-      // 1. FETCH CABANG
+      // 1. FETCH CABANG (dari service)
       // =====================
-      final branchRes = await http.get(
-        Uri.parse(BaseUrl.cabang),
-        headers: BaseUrl.defaultHeaders,
-      );
+      final branches = await ProductService.getBranches();
+      branchList.assignAll(branches);
 
-      if (branchRes.statusCode == BaseUrl.success) {
-        var body = json.decode(branchRes.body);
-        branchList.assignAll(body['data']);
-
-        if (selectedBranchId.value == null && branchList.isNotEmpty) {
-          selectedBranchId.value = branchList[0]['id'];
-          selectedBranchData.value = branchList[0];
-        }
+      if (selectedBranchId.value == null && branchList.isNotEmpty) {
+        selectedBranchId.value = branchList[0].id;
+        selectedBranchData.value = branchList[0];
       }
 
       // =====================
-      // 2. FETCH PRODUK (SEPERTI HOME)
+      // 2. FETCH PRODUK (dari service)
       // =====================
-      final Uri url = Uri.parse(BaseUrl.produk).replace(
-        queryParameters: {
-          if (selectedBranchId.value != null)
-            'branch_id': selectedBranchId.value.toString(),
-        },
+      List<ProductModel> products = await ProductService.getProducts(
+        selectedBranchId.value,
       );
 
-      final productRes = await http.get(
-        url,
-        headers: BaseUrl.defaultHeaders,
-      );
+      // =====================
+      // 3. GROUP BY CATEGORY
+      // =====================
+      Map<String, List<ProductModel>> grouped = {};
 
-      if (productRes.statusCode == BaseUrl.success) {
-        var body = json.decode(productRes.body);
-        List products = body['data'];
+      for (var p in products) {
+        String catName = p.category?.name ?? "Lainnya";
 
-        // format data
-        for (var p in products) {
-          p['price'] = int.tryParse(p['price'].toString()) ?? 0;
-
-          String rawImage = p['image'] ?? "";
-          if (rawImage.isNotEmpty && !rawImage.contains('http')) {
-            String storageUrl = BaseUrl.base.replaceAll('/api', '/storage');
-            p['image'] = "$storageUrl/$rawImage";
-          }
+        if (!grouped.containsKey(catName)) {
+          grouped[catName] = [];
         }
 
-        // =====================
-        // 3. GROUP BY CATEGORY
-        // =====================
-        Map<String, List> grouped = {};
+        grouped[catName]!.add(p);
+      }
 
-        for (var p in products) {
-          String catName = p['category']['name'] ?? "Lainnya";
+      List<CategoryGroupModel> result = [];
 
-          if (!grouped.containsKey(catName)) {
-            grouped[catName] = [];
-          }
+      grouped.forEach((key, value) {
+        result.add(
+          CategoryGroupModel(
+            category: CategoryModel(name: key),
+            products: value,
+          ),
+        );
+      });
 
-          grouped[catName]!.add(p);
-        }
+      allProductsWithCategories.assignAll(result);
+      // =====================
+      // 4. MAP INDEX SCROLL
+      // =====================
+      categoryIndexMap.clear();
 
-        List result = [];
-
-        grouped.forEach((key, value) {
-          result.add({
-            'category': {'name': key},
-            'products': value,
-          });
-        });
-
-        allProductsWithCategories.assignAll(result);
-
-        // =====================
-        // 4. MAP INDEX UNTUK SCROLL
-        // =====================
-        categoryIndexMap.clear();
-        for (int i = 0; i < result.length; i++) {
-          categoryIndexMap[result[i]['category']['name']] = i;
-        }
+      for (int i = 0; i < result.length; i++) {
+        categoryIndexMap[result[i].category.name ?? ""] = i;
       }
     } catch (e) {
       print("ERROR PRODUCT: $e");
@@ -116,24 +90,20 @@ class ProductController extends GetxController {
     }
   }
 
-  void changeBranch(dynamic branch) {
-    selectedBranchId.value = branch['id'];
+  void changeBranch(BranchModel branch) {
+    selectedBranchId.value = branch.id;
     selectedBranchData.value = branch;
 
     Get.back();
-
     fetchInitialData();
   }
 
-  // =====================
-  // SCROLL KE KATEGORI
-  // =====================
   void scrollToCategory(String categoryName) {
     int? index = categoryIndexMap[categoryName];
 
     if (index != null) {
       scrollController.animateTo(
-        index * 350, // bisa kamu adjust nanti
+        index * 350,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );

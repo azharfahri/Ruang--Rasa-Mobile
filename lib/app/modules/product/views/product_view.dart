@@ -2,6 +2,8 @@ import 'package:flutter/material.dart' hide MenuController;
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ruang_rasa_mobile/app/data/models/category_group_model.dart';
+import 'package:ruang_rasa_mobile/app/data/models/product_model.dart';
 
 import '../controllers/product_controller.dart';
 import 'package:ruang_rasa_mobile/app/modules/home/views/home_view.dart';
@@ -44,15 +46,10 @@ class ProductView extends GetView<ProductController> {
                 _buildBranchHeader(context),
                 _buildStickyCategoryTabs(),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final group =
-                          controller.allProductsWithCategories[index];
-                      return _buildCategoryGroup(group);
-                    },
-                    childCount:
-                        controller.allProductsWithCategories.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final group = controller.allProductsWithCategories[index];
+                    return _buildCategoryGroup(group);
+                  }, childCount: controller.allProductsWithCategories.length),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 120)),
               ],
@@ -77,38 +74,40 @@ class ProductView extends GetView<ProductController> {
             const Icon(Icons.location_on, color: accentColor, size: 20),
             const SizedBox(width: 8),
             Expanded(
-              child: Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            controller.selectedBranchData['name'] ??
-                                "Pilih Cabang",
-                            style: const TextStyle(
-                              color: textColor,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const Icon(
-                            Icons.keyboard_arrow_down,
+              child: Obx(
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          controller.selectedBranchData.value?.name ??
+                              "Pilih Cabang",
+                          style: const TextStyle(
                             color: textColor,
-                            size: 18,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
-                      ),
-                      Text(
-                        controller.selectedBranchData['address'] ?? "",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: secondaryTextColor,
-                          fontSize: 11,
                         ),
+                        const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: textColor,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                    Text(
+                      controller.selectedBranchData.value?.address ?? "",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 11,
                       ),
-                    ],
-                  )),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -129,9 +128,8 @@ class ProductView extends GetView<ProductController> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             itemCount: controller.allProductsWithCategories.length,
             itemBuilder: (context, index) {
-              final group =
-                  controller.allProductsWithCategories[index];
-              final catName = group['category']['name'];
+              final group = controller.allProductsWithCategories[index];
+              final catName = group.category.name ?? "";
 
               return Obx(() {
                 bool isSelected =
@@ -150,8 +148,7 @@ class ProductView extends GetView<ProductController> {
                       borderRadius: BorderRadius.circular(20),
                       border: isSelected
                           ? null
-                          : Border.all(
-                              color: accentColor.withOpacity(0.3)),
+                          : Border.all(color: accentColor.withOpacity(0.3)),
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -171,8 +168,8 @@ class ProductView extends GetView<ProductController> {
     );
   }
 
-  Widget _buildCategoryGroup(Map<String, dynamic> group) {
-    List products = group['products'];
+  Widget _buildCategoryGroup(CategoryGroupModel group) {
+    List<ProductModel> products = group.products;
     if (products.isEmpty) return const SizedBox();
 
     return Column(
@@ -181,7 +178,7 @@ class ProductView extends GetView<ProductController> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
           child: Text(
-            group['category']['name'],
+            group.category.name ?? "",
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -200,14 +197,13 @@ class ProductView extends GetView<ProductController> {
             childAspectRatio: 0.7,
           ),
           itemCount: products.length,
-          itemBuilder: (context, index) =>
-              _buildProductCard(products[index]),
+          itemBuilder: (context, index) => _buildProductCard(products[index]),
         ),
       ],
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> item) {
+  Widget _buildProductCard(ProductModel item) {
     return GestureDetector(
       onTap: () {
         try {
@@ -228,7 +224,7 @@ class ProductView extends GetView<ProductController> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: CachedNetworkImage(
-                  imageUrl: item['image'] ?? "",
+                  imageUrl: item.image ?? "",
                   width: double.infinity,
                   fit: BoxFit.cover,
                   placeholder: (context, url) => const Center(
@@ -248,7 +244,7 @@ class ProductView extends GetView<ProductController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item['name'] ?? "",
+                    item.name ?? "",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -259,7 +255,7 @@ class ProductView extends GetView<ProductController> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Rp ${NumberFormat('#,###').format(item['price'] ?? 0)}",
+                    "Rp ${NumberFormat('#,###').format(item.price ?? 0)}",
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -311,17 +307,16 @@ class ProductView extends GetView<ProductController> {
                 itemBuilder: (context, index) {
                   final branch = controller.branchList[index];
                   return ListTile(
-                    leading:
-                        const Icon(Icons.storefront, color: accentColor),
+                    leading: const Icon(Icons.storefront, color: accentColor),
                     title: Text(
-                      branch['name'],
+                      branch.name ?? "",
                       style: const TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
-                      branch['address'],
+                      branch.address ?? "",
                       style: const TextStyle(color: secondaryTextColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -356,8 +351,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-          BuildContext context, double shrinkOffset, bool overlapsContent) =>
-      SizedBox.expand(child: child);
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) => SizedBox.expand(child: child);
 
   @override
   bool shouldRebuild(_SliverAppBarDelegate old) =>

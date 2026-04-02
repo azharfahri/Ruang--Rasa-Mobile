@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ruang_rasa_mobile/app/modules/auth/controllers/auth_controller.dart';
-import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
+import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/addcart_controller.dart';
 import 'package:ruang_rasa_mobile/app/modules/home/controllers/home_controller.dart';
 import 'package:ruang_rasa_mobile/app/modules/product/controllers/product_controller.dart';
+import 'package:ruang_rasa_mobile/app/modules/profile/controllers/profile_controller.dart';
 
 import 'app/routes/app_pages.dart';
 
@@ -17,6 +18,7 @@ void main() async {
   Get.put(HomeController());
   Get.put(CartController());
   Get.put(ProductController());
+  Get.put(ProfileController());
   
   runApp(
     GetMaterialApp(

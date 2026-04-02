@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/cart_controller.dart';
+import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/addcart_controller.dart';
 import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/detail_produk_controller.dart';
 
 class DetailProdukView extends GetView<DetailProdukController> {

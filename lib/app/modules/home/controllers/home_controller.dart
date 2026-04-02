@@ -1,16 +1,16 @@
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:ruang_rasa_mobile/app/utils/api.dart';
 import 'package:flutter/material.dart';
+import 'package:ruang_rasa_mobile/app/data/models/branch_model.dart';
+import 'package:ruang_rasa_mobile/app/data/models/product_model.dart';
+import 'package:ruang_rasa_mobile/app/services/product_service.dart';
 
 class HomeController extends GetxController {
   var isLoading = false.obs;
-  
+
   // Data dari API
-  var listCabang = <dynamic>[].obs;
-  var listProduk = <dynamic>[].obs;
-  
+  var listCabang = <BranchModel>[].obs;
+  var listProduk = <ProductModel>[].obs;
+
   // State pilihan user
   var selectedCabangId = RxnInt();
 
@@ -20,80 +20,63 @@ class HomeController extends GetxController {
     fetchDataAwal();
   }
 
-  // Fungsi utama untuk mengambil semua data secara berurutan
+  // =====================
+  // FETCH DATA AWAL
+  // =====================
   Future<void> fetchDataAwal() async {
     isLoading(true);
     try {
-      // 1. Ambil Data Cabang terlebih dahulu
-      await fetchCabang();
-      
-      // 2. Jika cabang ditemukan, set default ke cabang pertama
+      // 1. Ambil cabang dari service
+      final branches = await ProductService.getBranches();
+      listCabang.assignAll(branches);
+
+      // 2. Set default cabang pertama
       if (listCabang.isNotEmpty) {
-        selectedCabangId.value = listCabang[0]['id'];
-        // 3. Ambil produk yang terhubung ke cabang tersebut (via pivot)
-        await fetchProduk(branchId: selectedCabangId.value);
+        selectedCabangId.value = listCabang[0].id;
+
+        // 3. Ambil produk berdasarkan cabang
+        final products = await ProductService.getProducts(
+          selectedCabangId.value,
+        );
+
+        listProduk.assignAll(products);
       }
     } catch (e) {
-      Get.snackbar("Error", "Gagal memuat data: $e", 
-          backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar(
+        "Error",
+        "Gagal memuat data: $e",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } finally {
       isLoading(false);
     }
   }
 
-  // Fungsi Fetch Cabang
-  Future<void> fetchCabang() async {
-    final response = await http.get(
-      Uri.parse(BaseUrl.cabang),
-      headers: BaseUrl.defaultHeaders,
-    );
-
-    if (response.statusCode == BaseUrl.success) {
-      var body = json.decode(response.body);
-      if (body['success'] == true) {
-        listCabang.assignAll(body['data']);
-      }
-    }
-  }
-
-  // Fungsi Fetch Produk dengan parameter branchId
-  Future<void> fetchProduk({int? branchId}) async {
-    // Membangun URL dengan query parameter ?branch_id=...
-    final Uri url = Uri.parse(BaseUrl.produk).replace(
-      queryParameters: {
-        if (branchId != null) 'branch_id': branchId.toString(),
-      },
-    );
-
-    final response = await http.get(
-      url,
-      headers: BaseUrl.defaultHeaders,
-    );
-
-    if (response.statusCode == BaseUrl.success) {
-      var body = json.decode(response.body);
-      if (body['success'] == true) {
-        listProduk.assignAll(body['data']);
-      }
-    }
-  }
-
-  // Dipanggil saat dropdown di View berubah
+  // =====================
+  // CHANGE CABANG
+  // =====================
   void changeCabang(int? id) {
     if (id != null) {
       selectedCabangId.value = id;
-      
-      // Ambil data ulang dari server untuk cabang yang dipilih
+
       isLoading(true);
-      fetchProduk(branchId: id).then((_) {
+
+      ProductService.getProducts(id).then((products) {
+        listProduk.assignAll(products);
+
         isLoading(false);
+
         Get.snackbar(
-          "Cabang Berhasil Diganti", 
+          "Cabang Berhasil Diganti",
           "Menu diperbarui sesuai lokasi pilihannmu",
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: const Color(0xFFF9BC60),
           colorText: const Color(0xFF001E1D),
         );
+      }).catchError((e) {
+        isLoading(false);
+        Get.snackbar("Error", "Gagal ambil produk");
       });
     }
   }

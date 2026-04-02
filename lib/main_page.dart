@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ruang_rasa_mobile/app/modules/home/views/home_view.dart';
 import 'package:ruang_rasa_mobile/app/modules/product/views/product_view.dart';
+import 'package:ruang_rasa_mobile/app/modules/profile/views/profile_view.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     HomeView(),
     ProductView(),
-    Center(child: Text("Profile")),
+    ProfileView(),
   ];
 
   @override
@@ -23,7 +24,7 @@ class _MainPageState extends State<MainPage> {
 
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF0B4D3B), // 👈 sama kayak background kamu
+          color: Color(0xFF004643), // 👈 sama kayak background kamu
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
