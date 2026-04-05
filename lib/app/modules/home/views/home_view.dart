@@ -353,7 +353,7 @@ class CartBar extends StatelessWidget {
       if (cart.items.isEmpty) return const SizedBox.shrink();
 
       return GestureDetector(
-        onTap: () => Get.toNamed('/cart'),
+        onTap: () => Get.toNamed(Routes.CHECKOUTPAGE),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(

@@ -5,6 +5,8 @@ import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/auth/views/login_view.dart';
 import '../modules/auth/views/register_view.dart';
+import '../modules/checkoutpage/bindings/checkoutpage_binding.dart';
+import '../modules/checkoutpage/views/checkoutpage_view.dart';
 import '../modules/dashboard/bindings/dashboard_binding.dart';
 import '../modules/dashboard/views/dashboard_view.dart';
 import '../modules/detail_produk/bindings/detail_produk_binding.dart';
@@ -75,6 +77,11 @@ class AppPages {
       name: _Paths.PRODUCT,
       page: () => const ProductView(),
       binding: ProductBinding(),
+    ),
+    GetPage(
+      name: _Paths.CHECKOUTPAGE,
+      page: () => const CheckoutpageView(),
+      binding: CheckoutpageBinding(),
     ),
   ];
 }

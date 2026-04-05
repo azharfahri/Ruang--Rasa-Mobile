@@ -1,47 +1,47 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ruang_rasa_mobile/app/data/models/cart_model.dart';
 
 class CartController extends GetxController {
   final box = GetStorage();
-  // list item keranjang
-  var items = <Map<String, dynamic>>[].obs;
 
+  var items = <CartModel>[].obs;
+
+  // ================= SAVE =================
   void saveCart() {
     final userId = box.read('user_id');
-    print("SAVE CART USER: $userId");
-print("ITEMS: $items");
+
     if (userId != null) {
-      box.write('cart_$userId', items.toList());
+      final data = items.map((e) => e.toJson()).toList();
+      box.write('cart_$userId', data);
     }
   }
 
+  // ================= LOAD =================
   void loadCart() {
     final userId = box.read('user_id');
-    print("LOAD CART USER: $userId");
-print("DATA: ${box.read('cart_$userId')}");
 
     if (userId != null) {
       final data = box.read('cart_$userId');
 
       if (data != null) {
-        items.value = List<Map<String, dynamic>>.from(data);
-        items.refresh();
+        items.value = (data as List)
+            .map((e) => CartModel.fromJson(e))
+            .toList();
       } else {
         items.clear();
       }
     }
   }
 
-  // ================= TAMBAH ITEM =================
-  void addItem(Map<String, dynamic> item) {
-    // cek apakah produk sudah ada
-    int index = items.indexWhere((i) => i['id'] == item['id']);
+  // ================= ADD =================
+  void addItem(CartModel item) {
+    int index =
+        items.indexWhere((i) => i.productId == item.productId);
 
     if (index != -1) {
-      // kalau sudah ada → tambah qty
-      items[index]['qty'] += item['qty'];
+      items[index].qty += item.qty;
     } else {
-      // kalau belum → tambah baru
       items.add(item);
     }
 
@@ -49,27 +49,41 @@ print("DATA: ${box.read('cart_$userId')}");
     saveCart();
   }
 
-  // ================= HAPUS ITEM =================
-  void removeItem(int id) {
-    items.removeWhere((item) => item['id'] == id);
+  // ================= REMOVE =================
+  void removeItem(int productId) {
+    items.removeWhere((item) => item.productId == productId);
     saveCart();
+  }
+
+  // ================= INCREMENT =================
+  void increment(CartModel item) {
+    item.qty++;
+    items.refresh();
+    saveCart();
+  }
+
+  // ================= DECREMENT =================
+  void decrement(CartModel item) {
+    if (item.qty > 1) {
+      item.qty--;
+      items.refresh();
+      saveCart();
+    }
   }
 
   // ================= TOTAL ITEM =================
   int get totalItems {
-    return items.fold(0, (sum, item) => sum + (item['qty'] as int));
+    return items.fold(0, (sum, item) => sum + item.qty);
   }
 
-  // ================= TOTAL HARGA =================
+  // ================= TOTAL PRICE =================
   int get totalPrice {
-    return items.fold(
-      0,
-      (sum, item) => sum + (item['price'] as int) * (item['qty'] as int),
-    );
+    return items.fold(0, (sum, item) => sum + item.price * item.qty);
   }
 
   // ================= CLEAR =================
   void clearCart() {
     items.clear();
+    saveCart();
   }
 }

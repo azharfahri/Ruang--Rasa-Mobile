@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ruang_rasa_mobile/app/data/models/cart_model.dart';
 import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/addcart_controller.dart';
 import 'package:ruang_rasa_mobile/app/modules/detail_produk/controllers/detail_produk_controller.dart';
 
@@ -248,15 +249,15 @@ class DetailProdukView extends GetView<DetailProdukController> {
 
                         final cart = Get.find<CartController>();
 
-                        cart.addItem({
-                          'id':
-                              product.id ??
-                              DateTime.now()
-                                  .millisecondsSinceEpoch, // 👈 ANTI NULL
-                          'name': product.name ?? 'Produk',
-                          'price': controller.totalPrice ?? 0,
-                          'qty': controller.quantity.value,
-                        });
+                        cart.addItem(
+                          CartModel(
+                            productId: product.id ?? 0,
+                            name: product.name ?? "Produk",
+                            price: controller.totalPrice,
+                            image: product.image,
+                            qty: controller.quantity.value,
+                          ),
+                        );
 
                         Get.back();
                       },
