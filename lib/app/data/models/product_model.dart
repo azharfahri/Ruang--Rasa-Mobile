@@ -3,6 +3,7 @@ class ProductModel {
   String? name;
   String? description;
   int? price;
+  int? stock;
   String? image;
   Category? category;
   List<VariantType>? variantTypes;
@@ -12,6 +13,7 @@ class ProductModel {
     this.name,
     this.description,
     this.price,
+    this.stock,
     this.image,
     this.category,
     this.variantTypes,
@@ -22,8 +24,11 @@ class ProductModel {
     name = json['name'];
     description = json['description'];
     price = json['price'];
+    stock = json['stock'];
     image = json['image'];
-    category = json['category'] != null ? Category.fromJson(json['category']) : null;
+    category = json['category'] != null
+        ? Category.fromJson(json['category'])
+        : null;
     if (json['variant_types'] != null) {
       variantTypes = <VariantType>[];
       json['variant_types'].forEach((v) {

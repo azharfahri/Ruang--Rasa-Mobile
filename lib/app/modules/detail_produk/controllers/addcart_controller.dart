@@ -25,19 +25,37 @@ class CartController extends GetxController {
       final data = box.read('cart_$userId');
 
       if (data != null) {
-        items.value = (data as List)
-            .map((e) => CartModel.fromJson(e))
-            .toList();
+        items.value = (data as List).map((e) => CartModel.fromJson(e)).toList();
       } else {
         items.clear();
       }
     }
   }
 
+  bool _isSameVariant(
+    List<Map<String, dynamic>>? a,
+    List<Map<String, dynamic>>? b,
+  ) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+
+    for (int i = 0; i < a.length; i++) {
+      if (a[i]['variant_option_id'] != b[i]['variant_option_id']) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   // ================= ADD =================
   void addItem(CartModel item) {
-    int index =
-        items.indexWhere((i) => i.productId == item.productId);
+    int index = items.indexWhere(
+      (i) =>
+          i.productId == item.productId &&
+          _isSameVariant(i.variants, item.variants),
+    );
 
     if (index != -1) {
       items[index].qty += item.qty;
@@ -66,9 +84,12 @@ class CartController extends GetxController {
   void decrement(CartModel item) {
     if (item.qty > 1) {
       item.qty--;
-      items.refresh();
-      saveCart();
+    } else {
+      items.removeWhere((i) => i.productId == item.productId);
     }
+
+    items.refresh();
+    saveCart();
   }
 
   // ================= TOTAL ITEM =================

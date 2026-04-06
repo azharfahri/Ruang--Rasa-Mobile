@@ -19,7 +19,7 @@ class DetailProdukController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
+
     // PERBAIKAN DI SINI:
     // Cek apakah data yang dikirim masih berupa JSON (Map) atau sudah ProductModel
     if (Get.arguments is Map<String, dynamic>) {
@@ -28,10 +28,20 @@ class DetailProdukController extends GetxController {
       product = Get.arguments as ProductModel;
     }
 
+    final args = Get.arguments;
+
+    if (args is Map) {
+      product = args['product'];
+    } else {
+      product = args as ProductModel;
+    }
+
     // Set default pilihan pertama untuk varian bertipe 'radio'
     if (product.variantTypes != null) {
       for (var type in product.variantTypes!) {
-        if (type.inputType == 'radio' && type.variantOptions != null && type.variantOptions!.isNotEmpty) {
+        if (type.inputType == 'radio' &&
+            type.variantOptions != null &&
+            type.variantOptions!.isNotEmpty) {
           selectedRadios[type.id!] = type.variantOptions!.first.id!;
         }
       }
@@ -58,6 +68,28 @@ class DetailProdukController extends GetxController {
     }
   }
 
+  List<Map<String, dynamic>> getSelectedVariants() {
+    List<Map<String, dynamic>> result = [];
+
+    if (product.variantTypes != null) {
+      for (var type in product.variantTypes!) {
+        if (type.variantOptions != null) {
+          for (var option in type.variantOptions!) {
+            if (selectedRadios[type.id] == option.id ||
+                selectedCheckboxes[option.id] == true) {
+              result.add({
+                "variant_type_id": type.id,
+                "variant_option_id": option.id,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   // Getter untuk menghitung total harga (Base Price + Price Impact) * Quantity
   int get totalPrice {
     int basePrice = product.price ?? 0;
@@ -68,11 +100,13 @@ class DetailProdukController extends GetxController {
         if (type.variantOptions != null) {
           for (var option in type.variantOptions!) {
             // Cek jika ini adalah opsi radio yang sedang dipilih user
-            if (type.inputType == 'radio' && selectedRadios[type.id] == option.id) {
+            if (type.inputType == 'radio' &&
+                selectedRadios[type.id] == option.id) {
               totalImpact += (option.priceImpact ?? 0);
             }
             // Cek jika ini adalah opsi checkbox yang sedang dicentang user
-            else if (type.inputType == 'checkbox' && selectedCheckboxes[option.id] == true) {
+            else if (type.inputType == 'checkbox' &&
+                selectedCheckboxes[option.id] == true) {
               totalImpact += (option.priceImpact ?? 0);
             }
           }

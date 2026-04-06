@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 
 import '../../main_page.dart';
+import '../modules/OrderSucces/bindings/order_succes_binding.dart';
+import '../modules/OrderSucces/views/order_succes_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/auth/views/login_view.dart';
@@ -82,6 +84,11 @@ class AppPages {
       name: _Paths.CHECKOUTPAGE,
       page: () => const CheckoutpageView(),
       binding: CheckoutpageBinding(),
+    ),
+    GetPage(
+      name: _Paths.ORDER_SUCCES,
+      page: () => const OrderSuccessView(),
+      binding: OrderSuccesBinding(),
     ),
   ];
 }

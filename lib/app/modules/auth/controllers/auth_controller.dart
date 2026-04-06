@@ -87,7 +87,6 @@ class AuthController extends GetxController {
       // ambil cart controller
       final cart = Get.find<CartController>();
 
-      cart.clearCart();
       cart.loadCart(); 
       isLoggedIn.value = true;
 
@@ -180,7 +179,7 @@ class AuthController extends GetxController {
       isLoggedIn.value = false;
 
       final cart = Get.find<CartController>();
-      cart.clearCart();
+      cart.items.clear();
 
       Get.offAllNamed(Routes.MAIN);
 
@@ -195,7 +194,7 @@ class AuthController extends GetxController {
       box.remove('token');
 
       final cart = Get.find<CartController>();
-      cart.clearCart();
+      cart.items.clear();
 
       Get.offAllNamed(Routes.MAIN);
     } finally {

@@ -18,6 +18,9 @@ class DetailProdukView extends GetView<DetailProdukController> {
   Widget build(BuildContext context) {
     // Kita panggil product dari controller, BUKAN dari Get.arguments lagi
     final product = controller.product;
+    final args = Get.arguments;
+    final isEdit = args is Map ? args['isEdit'] == true : false;
+    final cartItem = args is Map ? args['cartItem'] : null;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -249,27 +252,59 @@ class DetailProdukView extends GetView<DetailProdukController> {
 
                         final cart = Get.find<CartController>();
 
-                        cart.addItem(
-                          CartModel(
-                            productId: product.id ?? 0,
-                            name: product.name ?? "Produk",
-                            price: controller.totalPrice,
-                            image: product.image,
-                            qty: controller.quantity.value,
-                          ),
-                        );
+                        if (isEdit && cartItem != null) {
+                          // 🔥 MODE EDIT
+                          int index = cart.items.indexWhere(
+                            (i) => i.productId == cartItem.productId,
+                          );
 
-                        Get.back();
+                          if (index != -1) {
+                            cart.items[index] = CartModel(
+                              productId: cartItem.productId,
+                              name: cartItem.name,
+                              price: controller.totalPrice,
+                              image: cartItem.image,
+                              qty: controller.quantity.value,
+                              stock: cartItem.stock,
+                              variants: controller.getSelectedVariants(),
+                              product:
+                                  cartItem.product, // 🔥 penting biar ga null
+                            );
+
+                            cart.items.refresh();
+                            cart.saveCart();
+                          }
+
+                          Get.back();
+                        } else {
+                          // 🔥 MODE NORMAL
+                          cart.addItem(
+                            CartModel(
+                              productId: product.id ?? 0,
+                              name: product.name ?? "Produk",
+                              price: controller.totalPrice,
+                              image: product.image,
+                              qty: controller.quantity.value,
+                              stock: product.stock ?? 0,
+                              variants: controller.getSelectedVariants(),
+                              product: product,
+                            ),
+                          );
+
+                          Get.back();
+                        }
                       },
-                      child: Obx(
-                        () => Text(
-                          "+ Keranjang Rp ${controller.totalPrice}",
-                          style: const TextStyle(
-                            color: cardColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+
+                      // ❌ HAPUS Obx DI SINI
+                      child: Text(
+                        isEdit
+                            ? "Simpan Konfigurasi"
+                            : "+ Keranjang Rp ${controller.totalPrice}",
+                        style: const TextStyle(
+                          color: cardColor,
+                          fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),

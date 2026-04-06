@@ -14,6 +14,7 @@ abstract class Routes {
   static const DETAIL_PRODUK = _Paths.DETAIL_PRODUK;
   static const PRODUCT = _Paths.PRODUCT;
   static const CHECKOUTPAGE = _Paths.CHECKOUTPAGE;
+  static const ORDER_SUCCES = _Paths.ORDER_SUCCES;
 }
 
 abstract class _Paths {
@@ -29,4 +30,5 @@ abstract class _Paths {
   static const DETAIL_PRODUK = '/detail-produk';
   static const PRODUCT = '/product';
   static const CHECKOUTPAGE = '/checkoutpage';
+  static const ORDER_SUCCES = '/order-succes';
 }
