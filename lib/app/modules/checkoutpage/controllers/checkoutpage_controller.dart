@@ -13,12 +13,32 @@ class CheckoutController extends GetxController {
   final homeC = Get.find<HomeController>();
   final box = GetStorage();
 
+  bool get isCartValid {
+    if (cart.items.isEmpty) return false;
+
+    for (var item in cart.items) {
+      if (item.qty > item.stock || item.stock <= 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   Future<void> createOrder() async {
     try {
-      isLoading(true);
+      // 1. Cek validasi stok sebelum mengirim ke server
+      for (var item in cart.items) {
+        if (item.qty > item.stock) {
+          Get.snackbar(
+            "Stok Tidak Cukup",
+            "Produk ${item.name} melebihi stok yang tersedia (${item.stock})",
+          );
+          return; // Hentikan fungsi jika ada stok yang tidak mencukupi
+        }
+      }
 
+      isLoading(true);
       final token = box.read('token');
-      print(cart.items.map((e)=> e.variants).toList());
 
       final response = await http.post(
         Uri.parse(BaseUrl.base + "/orders"),

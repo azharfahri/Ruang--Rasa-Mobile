@@ -192,8 +192,14 @@ class HomeView extends GetView<HomeController> {
 
   // UPDATE PRODUCT CARD YANG LEBIH RAPI
   Widget _buildProductCard(ProductModel item) {
+    // Cek apakah stok tersedia
+    bool isOutOfStock = (item.stock ?? 0) <= 0;
+
     return GestureDetector(
-      onTap: () => Get.toNamed(Routes.DETAIL_PRODUK, arguments: item),
+      // Jika stok habis, onTap dinonaktifkan (null)
+      onTap: isOutOfStock
+          ? null
+          : () => Get.toNamed(Routes.DETAIL_PRODUK, arguments: item),
       child: Container(
         decoration: BoxDecoration(
           color: cardColor,
@@ -209,65 +215,124 @@ class HomeView extends GetView<HomeController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-              child: SizedBox(
-                height: 140,
-                width: double.infinity,
-                child: CachedNetworkImage(
-                  imageUrl: item.image ?? "",
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
+            // Bagian Gambar
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported),
+                  child: ColorFiltered(
+                    // Efek Abu-abu jika stok habis
+                    colorFilter: isOutOfStock
+                        ? const ColorFilter.mode(
+                            Colors.grey,
+                            BlendMode.saturation,
+                          )
+                        : const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.multiply,
+                          ),
+                    child: SizedBox(
+                      height: 140,
+                      width: double.infinity,
+                      child: CachedNetworkImage(
+                        imageUrl: item.image ?? "",
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.image_not_supported),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+
+                // Overlay "Stok Habis"
+                if (isOutOfStock)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(
+                          0.5,
+                        ), // Gelapkan sedikit
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            "STOK HABIS",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.category?.name ?? "-",
-                    style: const TextStyle(
-                      color: accentColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.8,
+            // Bagian Info Produk
+            Opacity(
+              // Kurangi opacity teks jika stok habis agar terlihat "disabled"
+              opacity: isOutOfStock ? 0.5 : 1.0,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.category?.name ?? "-",
+                      style: const TextStyle(
+                        color: accentColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.8,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-
-                  Text(
-                    item.name ?? "-",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: textColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 4),
+                    Text(
+                      item.name ?? "-",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors
+                            .white, // Sesuaikan dengan variabel textColor kamu
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    "Rp ${NumberFormat('#,###').format(item.price ?? 0)}",
-                    style: const TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 8),
+                    Text(
+                      "Rp ${NumberFormat('#,###').format(item.price ?? 0)}",
+                      style: const TextStyle(
+                        color: Colors
+                            .white70, // Sesuaikan dengan variabel secondaryTextColor kamu
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -320,11 +385,7 @@ class CartBar extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.person,
-                  color: Color(0xFF001E1D),
-                  size: 28,
-                ),
+                const Icon(Icons.person, color: Color(0xFF001E1D), size: 28),
                 const SizedBox(width: 16),
                 const Expanded(
                   child: Text(

@@ -318,21 +318,18 @@ class CheckoutpageView extends GetView<CheckoutController> {
               ),
             ),
 
-            Obx(
-              () => ElevatedButton(
-                onPressed: controller.isLoading.value
-                    ? null
-                    : () => controller.createOrder(),
+            Obx(() {
+              // Tombol aktif HANYA JIKA tidak loading DAN keranjang valid
+              bool canCheckout =
+                  !controller.isLoading.value && controller.isCartValid;
+
+              return ElevatedButton(
+                onPressed: canCheckout
+                    ? () => controller.createOrder()
+                    : null, // Jadi abu-abu jika tidak valid
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
-                  foregroundColor: bgColor,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+                  backgroundColor: canCheckout ? accentColor : Colors.grey,
+                  // ... sisa style lainnya
                 ),
                 child: controller.isLoading.value
                     ? const SizedBox(
@@ -343,12 +340,9 @@ class CheckoutpageView extends GetView<CheckoutController> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        "Pesan Sekarang",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-              ),
-            ),
+                    : const Text("Pesan Sekarang"),
+              );
+            }),
           ],
         ),
       );
