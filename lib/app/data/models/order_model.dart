@@ -1,4 +1,5 @@
 import 'package:ruang_rasa_mobile/app/data/models/order_item_model.dart';
+
 class OrderModel {
   final int? id;
   final int? userId;
@@ -26,12 +27,16 @@ class OrderModel {
       userId: json['user_id'],
       customerName: json['customer_name'],
       branchId: int.tryParse(json['branch_id'].toString()),
-      total: json['total'],
+      total: json['total'] != null 
+        ? (num.tryParse(json['total'].toString())?.toInt() ?? 0) 
+        : 0,
       status: json['status'],
       paymentStatus: json['payment_status'],
-      items: (json['items'] as List)
-          .map((e) => OrderItemModel.fromJson(e))
-          .toList(),
+      items: json['items'] != null
+          ? (json['items'] as List)
+                .map((e) => OrderItemModel.fromJson(e))
+                .toList()
+          : [], // Kasih list kosong jika null
     );
   }
 }

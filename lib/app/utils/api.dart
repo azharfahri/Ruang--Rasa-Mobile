@@ -6,9 +6,10 @@ class BaseUrl {
   static String logout = '$base/logout';
   static String profile = '$base/profile';
 
-  static String cabang = '$base/branches'; // Menyesuaikan JSON "List cabang" kamu
-  static String produk = '$base/products'; // Menyesuaikan JSON "Produk" kamu
+  static String cabang = '$base/branches'; 
+  static String produk = '$base/products'; 
   static String categories = '$base/categories';
+  static String orders = '$base/orders';
 
   //buat emulator android inimah
   // static String register = 'http://10.0.2.2:8000/api/register';

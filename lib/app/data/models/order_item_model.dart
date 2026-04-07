@@ -28,7 +28,9 @@ class OrderItemModel {
       productId: json['product_id'],
       quantity: json['quantity'],
       price: int.tryParse(json['price'].toString()),
-      subtotal: int.tryParse(json['subtotal'].toString()),
+      subtotal: json['subtotal'] != null 
+        ? (num.tryParse(json['subtotal'].toString())?.toInt() ?? 0) 
+        : 0,
       note: json['note'],
       details: (json['details'] as List)
           .map((e) => OrderDetailModel.fromJson(e))

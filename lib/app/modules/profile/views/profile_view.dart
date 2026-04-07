@@ -20,33 +20,21 @@ class ProfileView extends GetView<ProfileController> {
     return Scaffold(
       backgroundColor: bgColor,
       body: Obx(() {
-        // =====================
-        // GUEST MODE
-        // =====================
         if (!authC.isLoggedIn.value) {
           return _buildGuestView();
         }
 
-        // =====================
-        // LOADING
-        // =====================
         if (controller.isLoading.value) {
           return const Center(
             child: CircularProgressIndicator(color: accentColor),
           );
         }
 
-        // =====================
-        // USER VIEW
-        // =====================
         return _buildUserView(controller.profile.value);
       }),
     );
   }
 
-  // =====================
-  // GUEST VIEW
-  // =====================
   Widget _buildGuestView() {
     return Center(
       child: Column(
@@ -84,9 +72,6 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  // =====================
-  // USER VIEW
-  // =====================
   Widget _buildUserView(ProfileModel? profile) {
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -124,9 +109,20 @@ class ProfileView extends GetView<ProfileController> {
 
         const SizedBox(height: 30),
 
-        _buildMenuItem(Icons.history, "Riwayat Pesanan"),
-        _buildMenuItem(Icons.settings, "Pengaturan"),
-        _buildMenuItem(Icons.help_outline, "Bantuan"),
+        // Perubahan di sini: Menambahkan navigasi ke History
+        _buildMenuItem(
+          Icons.history, 
+          "Riwayat Pesanan", 
+          onTap: () => Get.toNamed('/history'), // Sesuaikan dengan route history kamu
+        ),
+        
+        _buildMenuItem(Icons.settings, "Pengaturan", onTap: () {
+          // Navigasi pengaturan jika ada
+        }),
+        
+        _buildMenuItem(Icons.help_outline, "Bantuan", onTap: () {
+          // Navigasi bantuan jika ada
+        }),
 
         const SizedBox(height: 30),
 
@@ -136,6 +132,7 @@ class ProfileView extends GetView<ProfileController> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -146,28 +143,32 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: accentColor),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.w500,
+  // Menambahkan parameter VoidCallback? onTap
+  Widget _buildMenuItem(IconData icon, String title, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: accentColor),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const Spacer(),
-          const Icon(Icons.arrow_forward_ios, size: 14, color: textColor),
-        ],
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios, size: 14, color: textColor),
+          ],
+        ),
       ),
     );
   }
