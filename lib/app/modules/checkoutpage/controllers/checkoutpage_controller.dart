@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
@@ -59,17 +60,21 @@ class CheckoutController extends GetxController {
       print(response.body);
 
       final body = json.decode(response.body);
-
       if (body['success'] == true) {
-        final data = body['data'];
-
         cart.items.clear();
         cart.saveCart();
 
-        Get.snackbar("Sukses", "Pesanan berhasil dibuat");
+        Get.snackbar(
+          "Sukses",
+          "Pesanan berhasil dibuat",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
 
+        // Pindah ke Home dan hapus semua history page sebelumnya
         Future.delayed(const Duration(milliseconds: 300), () {
-          Get.offAllNamed('/order-success', arguments: data);
+          // Ganti '/home' dengan nama route yang menampung BottomNavigationBar
+          Get.offAllNamed('/main');
         });
       } else {
         Get.snackbar("Error", body['message'] ?? "Gagal checkout");

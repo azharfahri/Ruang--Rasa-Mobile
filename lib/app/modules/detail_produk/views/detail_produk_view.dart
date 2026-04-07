@@ -146,9 +146,7 @@ class DetailProdukView extends GetView<DetailProdukController> {
                                           },
                                           // Lebar diatur agar pas (tidak pakai Expanded lagi di dalam Wrap)
                                           child: SizedBox(
-                                            width:
-                                                (Get.width / 2) -
-                                                28, // Dibagi 2 kolom dengan margin
+                                           width: (MediaQuery.of(context).size.width - 55) / 2,
                                             child: _buildSelectBox(
                                               label,
                                               null,
