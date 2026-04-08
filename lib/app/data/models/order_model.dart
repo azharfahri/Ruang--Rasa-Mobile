@@ -3,6 +3,7 @@ import 'package:ruang_rasa_mobile/app/data/models/order_item_model.dart';
 class OrderModel {
   final int? id;
   final int? userId;
+  final String? pickupCode;
   final String? customerName;
   final int? branchId;
   final int? total;
@@ -13,6 +14,7 @@ class OrderModel {
   OrderModel({
     this.id,
     this.userId,
+    this.pickupCode,
     this.customerName,
     this.branchId,
     this.total,
@@ -24,6 +26,7 @@ class OrderModel {
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: json['id'],
+      pickupCode: json['pickup_code'],
       userId: json['user_id'],
       customerName: json['customer_name'],
       branchId: int.tryParse(json['branch_id'].toString()),

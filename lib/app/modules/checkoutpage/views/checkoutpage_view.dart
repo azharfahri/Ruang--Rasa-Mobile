@@ -156,7 +156,7 @@ class CheckoutpageView extends GetView<CheckoutController> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // IMAGE
+                // 1. IMAGE (Fixed Width)
                 if (item.image != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
@@ -170,7 +170,7 @@ class CheckoutpageView extends GetView<CheckoutController> {
 
                 const SizedBox(width: 12),
 
-                // INFO
+                // 2. INFO (Expanded - Mengambil sisa ruang yang tersedia)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,10 +181,10 @@ class CheckoutpageView extends GetView<CheckoutController> {
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-
                       const SizedBox(height: 4),
-
                       if (item.variants != null && item.variants!.isNotEmpty)
                         Text(
                           item.variantText,
@@ -193,17 +193,12 @@ class CheckoutpageView extends GetView<CheckoutController> {
                             fontSize: 12,
                           ),
                         ),
-
                       const SizedBox(height: 6),
-
                       Text(
                         "Rp ${NumberFormat('#,###').format(item.price)}",
                         style: const TextStyle(color: accentColor),
                       ),
-
                       const SizedBox(height: 4),
-
-                      // 🔥 STOCK INFO
                       Text(
                         "Stok: ${item.stock}",
                         style: const TextStyle(
@@ -215,62 +210,60 @@ class CheckoutpageView extends GetView<CheckoutController> {
                   ),
                 ),
 
-                // QTY + ACTION
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => cart.decrement(item),
-                          icon: const Icon(Icons.remove, color: Colors.white),
-                        ),
+                const SizedBox(width: 8),
 
-                        Text(
-                          "${item.qty}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-
-                        IconButton(
-                          onPressed: item.qty >= item.stock
-                              ? null // 🔥 disable kalau mentok
-                              : () => cart.increment(item),
-                          icon: Icon(
-                            Icons.add,
-                            color: item.qty >= item.stock
-                                ? Colors.grey
-                                : Colors.white,
+                // 3. ACTION COLUMN (Fixed Width Area)
+                // Kita bungkus dengan Sizedbox agar tidak memakan tempat INFO
+                SizedBox(
+                  width: 110, // Memberikan batas pasti agar tidak overflow
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _buildQtyBtn(Icons.remove, () => cart.decrement(item)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              "${item.qty}",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-
-                    // 🔥 WARNING
-                    if (item.stock == 0)
-                      const Text(
-                        "Stok Habis",
-                        style: TextStyle(color: Colors.red, fontSize: 10),
-                      )
-                    else if (item.qty == item.stock)
-                      const Text(
-                        "Maksimal",
-                        style: TextStyle(color: Colors.orange, fontSize: 10),
+                          _buildQtyBtn(
+                            Icons.add, 
+                            item.qty >= item.stock ? null : () => cart.increment(item),
+                            isDisabled: item.qty >= item.stock
+                          ),
+                        ],
                       ),
+                      
+                      // Status Warning
+                      if (item.stock == 0)
+                        const Text("Habis", style: TextStyle(color: Colors.red, fontSize: 10))
+                      else if (item.qty == item.stock)
+                        const Text("Maksimal", style: TextStyle(color: Colors.orange, fontSize: 10)),
 
-                    // 🔥 GANTI BUTTON
-                    TextButton(
-                      onPressed: () {
-                        Get.toNamed(
-                          Routes.DETAIL_PRODUK,
-                          arguments: {
-                            "product": item.product,
-                            "isEdit": true,
-                            "cartItem": item,
-                          },
-                        );
-                      },
-                      child: const Text("Ganti"),
-                    ),
-                  ],
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(50, 30),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        onPressed: () {
+                          Get.toNamed(
+                            Routes.DETAIL_PRODUK,
+                            arguments: {
+                              "product": item.product,
+                              "isEdit": true,
+                              "cartItem": item,
+                            },
+                          );
+                        },
+                        child: const Text("Ganti", style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -278,6 +271,21 @@ class CheckoutpageView extends GetView<CheckoutController> {
         }).toList(),
       );
     });
+  }
+
+  // Helper agar kodenya tidak numpuk
+  Widget _buildQtyBtn(IconData icon, VoidCallback? onTap, {bool isDisabled = false}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: isDisabled ? Colors.grey.withOpacity(0.2) : accentColor.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: isDisabled ? Colors.grey : accentColor, size: 18),
+      ),
+    );
   }
 
   // ================= BOTTOM BAR =================
