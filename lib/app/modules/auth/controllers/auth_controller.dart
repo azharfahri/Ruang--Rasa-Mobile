@@ -43,37 +43,36 @@ class AuthController extends GetxController {
           .login(email, password)
           .timeout(const Duration(seconds: 10));
 
-      // ===== ERROR HANDLING WAJIB =====
-      if (response.hasError) {
+      // ===== ERROR HANDLING =====
+      if (response.hasError || response.statusCode != 200) {
+        final body = response.body;
+
         if (response.statusCode == 401) {
           Get.snackbar(
             'Login gagal',
             'Email atau password salah',
             backgroundColor: const Color(0xFFE16162),
             colorText: Colors.white,
-            snackPosition: SnackPosition.TOP,
           );
           return;
         }
 
-        if (response.statusCode == 422) {
-          final errors = response.body['errors'];
+        if (response.statusCode == 422 && body != null) {
+          final errors = body['errors'];
           Get.snackbar(
             'Data tidak valid',
-            errors.values.first[0],
+            errors?.values.first[0] ?? 'Input tidak valid',
             backgroundColor: const Color(0xFFF9BC60),
             colorText: const Color(0xFF001E1D),
-            snackPosition: SnackPosition.TOP,
           );
           return;
         }
 
         Get.snackbar(
-          'Server bermasalah',
-          response.statusText ?? 'Terjadi kesalahan',
-          backgroundColor: Colors.black87,
+          'Login gagal',
+          body?['message'] ?? 'Akun tidak ditemukan',
+          backgroundColor: const Color(0xFFE16162),
           colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
         );
         return;
       }
@@ -82,23 +81,25 @@ class AuthController extends GetxController {
       final token = response.body['token'];
       box.write('token', token);
       box.write('user_id', response.body['user']['id']);
-      print("USER ID: ${box.read('user_id')}");
 
-      // ambil cart controller
       final cart = Get.find<CartController>();
-
-      cart.loadCart(); 
+      cart.loadCart();
       isLoggedIn.value = true;
 
+      // Pindah halaman dulu
       Get.offAllNamed(Routes.MAIN);
 
-      Get.snackbar(
-        'Selamat datang',
-        'Berhasil masuk ke Ruang Rasa',
-        backgroundColor: const Color(0xFF004643),
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      // Munculkan snackbar setelah navigasi selesai
+      Future.delayed(const Duration(milliseconds: 600), () {
+        Get.snackbar(
+          'Selamat datang',
+          'Berhasil masuk ke Ruang Rasa',
+          backgroundColor: const Color(0xFF004643),
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      });
+
     } catch (_) {
       Get.snackbar(
         'Koneksi bermasalah',
@@ -118,23 +119,22 @@ class AuthController extends GetxController {
 
       final response = await api.register(name, email, password);
 
-      // ===== REGISTER BERHASIL =====
       if (response.statusCode == BaseUrl.created) {
-        Get.snackbar(
-          'Akun berhasil dibuat',
-          'Silakan login dan nikmati Ruang Rasa',
-          backgroundColor: const Color(0xFF004643),
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
-        );
-
-        // balik ke login
+        // Balik ke login
         Get.offAllNamed(Routes.LOGIN);
-      }
-      // ===== VALIDATION ERROR =====
-      else if (response.statusCode == BaseUrl.unprocessableEntity) {
-        final errors = response.body['errors'];
 
+        // Delay snackbar
+        Future.delayed(const Duration(milliseconds: 600), () {
+          Get.snackbar(
+            'Akun berhasil dibuat',
+            'Silakan login dan nikmati Ruang Rasa',
+            backgroundColor: const Color(0xFF004643),
+            colorText: Colors.white,
+            snackPosition: SnackPosition.TOP,
+          );
+        });
+      } else if (response.statusCode == BaseUrl.unprocessableEntity) {
+        final errors = response.body['errors'];
         Get.snackbar(
           'Data tidak valid',
           errors.values.first[0],
@@ -142,9 +142,7 @@ class AuthController extends GetxController {
           colorText: const Color(0xFF001E1D),
           snackPosition: SnackPosition.TOP,
         );
-      }
-      // ===== ERROR LAIN =====
-      else {
+      } else {
         Get.snackbar(
           'Gagal daftar',
           response.body['message'] ?? 'Terjadi kesalahan',
@@ -181,21 +179,23 @@ class AuthController extends GetxController {
       final cart = Get.find<CartController>();
       cart.items.clear();
 
+      // Pindah ke halaman utama
       Get.offAllNamed(Routes.MAIN);
 
-      Get.snackbar(
-        'Sampai jumpa',
-        'Kamu keluar dari Ruang Rasa',
-        backgroundColor: const Color(0xFF001E1D),
-        colorText: const Color(0xFFABD1C6),
-        snackPosition: SnackPosition.TOP,
-      );
+      // Delay snackbar
+      Future.delayed(const Duration(milliseconds: 600), () {
+        Get.snackbar(
+          'Sampai jumpa',
+          'Kamu keluar dari Ruang Rasa',
+          backgroundColor: const Color(0xFF001E1D),
+          colorText: const Color(0xFFABD1C6),
+          snackPosition: SnackPosition.TOP,
+        );
+      });
     } catch (_) {
       box.remove('token');
-
       final cart = Get.find<CartController>();
       cart.items.clear();
-
       Get.offAllNamed(Routes.MAIN);
     } finally {
       isLoading.value = false;

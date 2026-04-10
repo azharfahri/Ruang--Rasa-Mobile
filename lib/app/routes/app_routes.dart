@@ -17,6 +17,8 @@ abstract class Routes {
   static const ORDER_SUCCES = _Paths.ORDER_SUCCES;
   static const HISTORY = _Paths.HISTORY;
   static const HISTORY_DETAIL = _Paths.HISTORY_DETAIL;
+  static const PENGATURAN = _Paths.PENGATURAN;
+  static const EDITPROFILE = _Paths.EDITPROFILE;
 }
 
 abstract class _Paths {
@@ -35,4 +37,6 @@ abstract class _Paths {
   static const ORDER_SUCCES = '/order-succes';
   static const HISTORY = '/history';
   static const HISTORY_DETAIL = '/history-detail';
+  static const PENGATURAN = '/pengaturan';
+  static const EDITPROFILE = '/editprofile';
 }

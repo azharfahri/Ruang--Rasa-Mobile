@@ -1,6 +1,6 @@
 class BaseUrl {
-  static String base = 'https://ruangrasa.web.id/api';
-  //static String base = 'http://10.0.2.2:8000/api';
+  //static String base = 'https://ruangrasa.web.id/api';
+  static String base = 'http://10.0.2.2:8000/api';
 
   static String register = '$base/register';
   static String login = '$base/login';
@@ -11,6 +11,8 @@ class BaseUrl {
   static String produk = '$base/products'; 
   static String categories = '$base/categories';
   static String orders = '$base/orders';
+  static String deleteAccount = '$base/delete-account';
+  static String updateProfile = '$base/update-profile';
 
   static Map<String, String> defaultHeaders = {
     'Accept': 'application/json',

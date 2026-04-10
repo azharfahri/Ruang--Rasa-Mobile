@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ruang_rasa_mobile/app/data/models/profile_model.dart';
+import 'package:ruang_rasa_mobile/app/modules/pengaturan/views/pengaturan_view.dart';
 import '../controllers/profile_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
 
@@ -111,18 +112,27 @@ class ProfileView extends GetView<ProfileController> {
 
         // Perubahan di sini: Menambahkan navigasi ke History
         _buildMenuItem(
-          Icons.history, 
-          "Riwayat Pesanan", 
-          onTap: () => Get.toNamed('/history'), // Sesuaikan dengan route history kamu
+          Icons.history,
+          "Riwayat Pesanan",
+          onTap: () =>
+              Get.toNamed('/history'), // Sesuaikan dengan route history kamu
         ),
-        
-        _buildMenuItem(Icons.settings, "Pengaturan", onTap: () {
-          // Navigasi pengaturan jika ada
-        }),
-        
-        _buildMenuItem(Icons.help_outline, "Bantuan", onTap: () {
-          // Navigasi bantuan jika ada
-        }),
+
+        _buildMenuItem(
+          Icons.settings,
+          "Pengaturan",
+          onTap: () {
+            Get.to(() => const PengaturanPage());
+          },
+        ),
+
+        _buildMenuItem(
+          Icons.help_outline,
+          "Bantuan",
+          onTap: () {
+            // Navigasi bantuan jika ada
+          },
+        ),
 
         const SizedBox(height: 30),
 

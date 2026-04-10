@@ -13,12 +13,16 @@ import '../modules/dashboard/bindings/dashboard_binding.dart';
 import '../modules/dashboard/views/dashboard_view.dart';
 import '../modules/detail_produk/bindings/detail_produk_binding.dart';
 import '../modules/detail_produk/views/detail_produk_view.dart';
+import '../modules/editprofile/bindings/editprofile_binding.dart';
+import '../modules/editprofile/views/editprofile_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
 import '../modules/history_detail/bindings/history_detail_binding.dart';
 import '../modules/history_detail/views/history_detail_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/pengaturan/bindings/pengaturan_binding.dart';
+import '../modules/pengaturan/views/pengaturan_view.dart';
 import '../modules/product/bindings/product_binding.dart';
 import '../modules/product/views/product_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -103,6 +107,16 @@ class AppPages {
       name: _Paths.HISTORY_DETAIL,
       page: () => const HistoryDetailView(),
       binding: HistoryDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.PENGATURAN,
+      page: () => const PengaturanPage(),
+      binding: PengaturanBinding(),
+    ),
+    GetPage(
+      name: _Paths.EDITPROFILE,
+      page: () => const EditProfilePage(),
+      binding: EditprofileBinding(),
     ),
   ];
 }
