@@ -126,13 +126,13 @@ class ProfileView extends GetView<ProfileController> {
           },
         ),
 
-        _buildMenuItem(
-          Icons.help_outline,
-          "Bantuan",
-          onTap: () {
-            // Navigasi bantuan jika ada
-          },
-        ),
+        // _buildMenuItem(
+        //   Icons.help_outline,
+        //   "Bantuan",
+        //   onTap: () {
+        //     // Navigasi bantuan jika ada
+        //   },
+        // ),
 
         const SizedBox(height: 30),
 
