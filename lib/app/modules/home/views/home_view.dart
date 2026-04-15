@@ -94,8 +94,8 @@ class HomeView extends GetView<HomeController> {
                   const SizedBox(height: 30),
 
                   // MENU SPESIAL
-                  _buildSectionTitle('Menu Spesial', 'Lihat Semua'),
-                  const SizedBox(height: 16),
+                  // _buildSectionTitle('Menu Spesial', 'Lihat Semua'),
+                  // const SizedBox(height: 16),
 
                   // GRID PRODUK (Dibatasi misal 4-6 produk saja)
                   GridView.builder(

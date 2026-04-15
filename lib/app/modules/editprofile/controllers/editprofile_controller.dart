@@ -28,7 +28,7 @@ class EditprofileController extends GetxController {
     } else {
       // Delay sedikit agar view siap menerima snackbar
       Future.delayed(Duration.zero, () {
-        Get.snackbar("Error", "Sesi berakhir, silakan login kembali.");
+        Get.snackbar("Selamat datang", "Silakan masuk");
       });
     }
   }

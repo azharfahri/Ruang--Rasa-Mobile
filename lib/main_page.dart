@@ -24,7 +24,7 @@ class _MainPageState extends State<MainPage> {
 
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF004643), // 👈 sama kayak background kamu
+          color: Color(0xFF004643), 
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -39,7 +39,7 @@ class _MainPageState extends State<MainPage> {
           elevation: 0,
           type: BottomNavigationBarType.fixed,
 
-          selectedItemColor: Color(0xFFFBBF24), // 👈 kuning accent
+          selectedItemColor: Color(0xFFFBBF24),
           unselectedItemColor: Colors.white70,
 
           showUnselectedLabels: true,
